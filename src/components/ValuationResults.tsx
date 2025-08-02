@@ -40,7 +40,7 @@ export const ValuationResults: React.FC<ValuationResultsProps> = ({ data, imageU
   };
 
   const createSearchQuery = () => {
-    return encodeURIComponent(`${data.title} ${data.artist} ${data.dimensions} poster`);
+    return encodeURIComponent(`${data.title} ${data.artist} poster`);
   };
 
   const getSellingLinks = () => {
@@ -49,7 +49,7 @@ export const ValuationResults: React.FC<ValuationResultsProps> = ({ data, imageU
       ebay: `https://www.ebay.com/sch/i.html?_nkw=${query}`,
       heritage: `https://www.ha.com/search-results.s?N=0&Nty=1&Ntk=SI_Titles&Ntt=${query}`,
       etsy: `https://www.etsy.com/search?q=${query}`,
-      collectors: `https://www.collectors.com/search?q=${query}`
+      movieposters: `https://www.movieposters.com/search?query=${query}`
     };
   };
 
@@ -231,15 +231,15 @@ export const ValuationResults: React.FC<ValuationResultsProps> = ({ data, imageU
             <Button 
               variant="outline" 
               className="h-auto p-4 justify-start"
-              onClick={() => window.open(links.collectors, '_blank')}
+              onClick={() => window.open(links.movieposters, '_blank')}
             >
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 rounded bg-purple-600 flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">C</span>
+                  <span className="text-white text-xs font-bold">M</span>
                 </div>
                 <div className="text-left">
-                  <p className="font-medium">Collectors.com</p>
-                  <p className="text-xs text-muted-foreground">Specialized poster community</p>
+                  <p className="font-medium">MoviePosters.com</p>
+                  <p className="text-xs text-muted-foreground">Specialized poster marketplace</p>
                 </div>
                 <ExternalLink className="w-4 h-4 ml-auto" />
               </div>
