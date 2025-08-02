@@ -39,6 +39,22 @@ export const ValuationResults: React.FC<ValuationResultsProps> = ({ data, imageU
     }).format(price);
   };
 
+  const createSearchQuery = () => {
+    return encodeURIComponent(`${data.title} ${data.artist} ${data.dimensions} poster`);
+  };
+
+  const getSellingLinks = () => {
+    const query = createSearchQuery();
+    return {
+      ebay: `https://www.ebay.com/sch/i.html?_nkw=${query}`,
+      heritage: `https://www.ha.com/search-results.s?N=0&Nty=1&Ntk=SI_Titles&Ntt=${query}`,
+      etsy: `https://www.etsy.com/search?q=${query}`,
+      collectors: `https://www.collectors.com/search?q=${query}`
+    };
+  };
+
+  const links = getSellingLinks();
+
   const getConditionColor = (condition: string) => {
     switch (condition) {
       case 'Excellent': return 'bg-estimate-high text-white';
@@ -161,7 +177,11 @@ export const ValuationResults: React.FC<ValuationResultsProps> = ({ data, imageU
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-2 gap-4">
-            <Button variant="outline" className="h-auto p-4 justify-start">
+            <Button 
+              variant="outline" 
+              className="h-auto p-4 justify-start"
+              onClick={() => window.open(links.ebay, '_blank')}
+            >
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 rounded bg-blue-600 flex items-center justify-center">
                   <span className="text-white text-xs font-bold">e</span>
@@ -174,7 +194,11 @@ export const ValuationResults: React.FC<ValuationResultsProps> = ({ data, imageU
               </div>
             </Button>
             
-            <Button variant="outline" className="h-auto p-4 justify-start">
+            <Button 
+              variant="outline" 
+              className="h-auto p-4 justify-start"
+              onClick={() => window.open(links.heritage, '_blank')}
+            >
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 rounded bg-orange-600 flex items-center justify-center">
                   <span className="text-white text-xs font-bold">H</span>
@@ -187,7 +211,11 @@ export const ValuationResults: React.FC<ValuationResultsProps> = ({ data, imageU
               </div>
             </Button>
             
-            <Button variant="outline" className="h-auto p-4 justify-start">
+            <Button 
+              variant="outline" 
+              className="h-auto p-4 justify-start"
+              onClick={() => window.open(links.etsy, '_blank')}
+            >
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 rounded bg-green-600 flex items-center justify-center">
                   <span className="text-white text-xs font-bold">E</span>
@@ -200,7 +228,11 @@ export const ValuationResults: React.FC<ValuationResultsProps> = ({ data, imageU
               </div>
             </Button>
             
-            <Button variant="outline" className="h-auto p-4 justify-start">
+            <Button 
+              variant="outline" 
+              className="h-auto p-4 justify-start"
+              onClick={() => window.open(links.collectors, '_blank')}
+            >
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 rounded bg-purple-600 flex items-center justify-center">
                   <span className="text-white text-xs font-bold">C</span>
