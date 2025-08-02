@@ -88,14 +88,36 @@ const conditionMultipliers = {
   'Poor': 0.2
 };
 
-export const analyzeArtwork = async (imageFile: File, width: string, height: string): Promise<ArtAnalysisResult> => {
-  // Simulate AI processing time for online identification
-  await new Promise(resolve => setTimeout(resolve, 4000 + Math.random() * 2000));
+export const analyzeArtwork = async (imageFile: File, width: string, height: string, name?: string, artist?: string, year?: string): Promise<ArtAnalysisResult> => {
+  // Simulate AI processing time for analysis
+  await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 2000));
   
-  // Mock analysis - randomly select a poster and add variations
-  const basePoster = mockPosters[Math.floor(Math.random() * mockPosters.length)];
+  // Use manual input if provided, otherwise fall back to mock identification
+  let finalPoster;
+  
+  if (name && artist) {
+    // Use manual input data
+    finalPoster = {
+      title: name,
+      artist: artist,
+      year: year || new Date().getFullYear().toString(),
+      medium: "Print poster",
+      style: "Contemporary Poster",
+      baseValue: 50, // Base value for user-identified posters
+      marketTrend: 'stable' as const,
+    };
+  } else {
+    // Fall back to mock identification
+    finalPoster = mockPosters[Math.floor(Math.random() * mockPosters.length)];
+  }
   const condition = conditions[Math.floor(Math.random() * conditions.length)];
   const conditionMultiplier = conditionMultipliers[condition];
+  
+  // Calculate age multiplier - modern posters (last 20 years) are less valuable
+  const posterYear = parseInt(year || finalPoster.year) || new Date().getFullYear();
+  const currentYear = new Date().getFullYear();
+  const age = currentYear - posterYear;
+  const ageMultiplier = age > 20 ? Math.min(2.0, 1 + (age - 20) * 0.05) : 0.7; // Older = more valuable, newer = less valuable
   
   // Calculate size multiplier based on dimensions
   const widthNum = parseInt(width) || 24;
@@ -105,7 +127,7 @@ export const analyzeArtwork = async (imageFile: File, width: string, height: str
   
   // Add some randomness to the estimates
   const variationFactor = 0.8 + Math.random() * 0.4; // 0.8 to 1.2
-  const baseEstimate = basePoster.baseValue * conditionMultiplier * sizeMultiplier * variationFactor;
+  const baseEstimate = finalPoster.baseValue * conditionMultiplier * sizeMultiplier * ageMultiplier * variationFactor;
   
   const lowEstimate = Math.round(baseEstimate * 0.8);
   const highEstimate = Math.round(baseEstimate * 1.3);
@@ -141,16 +163,16 @@ export const analyzeArtwork = async (imageFile: File, width: string, height: str
   };
 
   return {
-    title: basePoster.title,
-    artist: basePoster.artist,
-    year: basePoster.year,
-    medium: basePoster.medium,
+    title: finalPoster.title,
+    artist: finalPoster.artist,
+    year: year || finalPoster.year,
+    medium: finalPoster.medium,
     condition,
-    style: basePoster.style,
+    style: finalPoster.style,
     dimensions: `${width}" × ${height}"`,
     lowEstimate,
     highEstimate,
-    marketTrend: basePoster.marketTrend,
+    marketTrend: finalPoster.marketTrend,
     confidence: Math.max(40, Math.min(98, confidence)),
     comparableSales: generateComparableSales()
   };

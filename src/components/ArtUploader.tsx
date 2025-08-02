@@ -10,6 +10,9 @@ interface PosterData {
   file: File;
   width: string;
   height: string;
+  name: string;
+  artist: string;
+  year: string;
 }
 
 interface ArtUploaderProps {
@@ -23,6 +26,9 @@ export const ArtUploader: React.FC<ArtUploaderProps> = ({ onImageUpload, isAnaly
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [width, setWidth] = useState('');
   const [height, setHeight] = useState('');
+  const [name, setName] = useState('');
+  const [artist, setArtist] = useState('');
+  const [year, setYear] = useState('');
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -57,7 +63,10 @@ export const ArtUploader: React.FC<ArtUploaderProps> = ({ onImageUpload, isAnaly
       onImageUpload({
         file: selectedFile,
         width,
-        height
+        height,
+        name: name || 'Unknown Poster',
+        artist: artist || 'Unknown Artist',
+        year: year || new Date().getFullYear().toString()
       });
     }
   };
@@ -77,6 +86,9 @@ export const ArtUploader: React.FC<ArtUploaderProps> = ({ onImageUpload, isAnaly
     setSelectedFile(null);
     setWidth('');
     setHeight('');
+    setName('');
+    setArtist('');
+    setYear('');
   };
 
   return (
@@ -165,45 +177,93 @@ export const ArtUploader: React.FC<ArtUploaderProps> = ({ onImageUpload, isAnaly
           </Card>
 
           {!isAnalyzing && (
-            <Card className="p-6 shadow-elegant">
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2 mb-4">
-                  <Ruler className="w-5 h-5 text-gallery-accent" />
-                  <h3 className="text-lg font-semibold">Poster Dimensions</h3>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="width">Width (inches)</Label>
-                    <Input
-                      id="width"
-                      type="number"
-                      placeholder="24"
-                      value={width}
-                      onChange={(e) => setWidth(e.target.value)}
-                    />
+            <div className="space-y-4">
+              <Card className="p-6 shadow-elegant">
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2 mb-4">
+                    <Ruler className="w-5 h-5 text-gallery-accent" />
+                    <h3 className="text-lg font-semibold">Poster Details</h3>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="height">Height (inches)</Label>
-                    <Input
-                      id="height"
-                      type="number"
-                      placeholder="36"
-                      value={height}
-                      onChange={(e) => setHeight(e.target.value)}
-                    />
+                  
+                  <div className="grid gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Poster Name (Optional)</Label>
+                      <Input
+                        id="name"
+                        type="text"
+                        placeholder="e.g., Star Wars: A New Hope"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="artist">Artist/Designer (Optional)</Label>
+                      <Input
+                        id="artist"
+                        type="text"
+                        placeholder="e.g., Drew Struzan"
+                        value={artist}
+                        onChange={(e) => setArtist(e.target.value)}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="year">Year (Optional)</Label>
+                      <Input
+                        id="year"
+                        type="number"
+                        placeholder="e.g., 1977"
+                        min="1900"
+                        max={new Date().getFullYear()}
+                        value={year}
+                        onChange={(e) => setYear(e.target.value)}
+                      />
+                      <p className="text-xs text-muted-foreground">Leave blank for modern prints (assumed last 20 years)</p>
+                    </div>
                   </div>
                 </div>
-                <Button 
-                  onClick={handleAnalyze}
-                  disabled={!selectedFile || !width || !height}
-                  className="w-full"
-                  variant="premium"
-                >
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Identify & Value Poster
-                </Button>
-              </div>
-            </Card>
+              </Card>
+
+              <Card className="p-6 shadow-elegant">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Dimensions (Required)</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="width">Width (inches)</Label>
+                      <Input
+                        id="width"
+                        type="number"
+                        placeholder="24"
+                        value={width}
+                        onChange={(e) => setWidth(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="height">Height (inches)</Label>
+                      <Input
+                        id="height"
+                        type="number"
+                        placeholder="36"
+                        value={height}
+                        onChange={(e) => setHeight(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
+                  <Button 
+                    onClick={handleAnalyze}
+                    disabled={!selectedFile || !width || !height}
+                    className="w-full"
+                    variant="premium"
+                  >
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Analyze & Value Poster
+                  </Button>
+                </div>
+              </Card>
+            </div>
           )}
         </div>
       )}

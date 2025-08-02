@@ -32,23 +32,23 @@ const Index = () => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const handleImageUpload = async (data: { file: File; width: string; height: string }) => {
+  const handleImageUpload = async (data: { file: File; width: string; height: string; name: string; artist: string; year: string }) => {
     setIsAnalyzing(true);
     const url = URL.createObjectURL(data.file);
     setImageUrl(url);
 
     try {
-      const analysis = await analyzeArtwork(data.file, data.width, data.height);
+      const analysis = await analyzeArtwork(data.file, data.width, data.height, data.name, data.artist, data.year);
       setValuationData(analysis);
       
       toast({
-        title: "Identification Complete!",
-        description: `Your ${analysis.title} has been identified and valued with ${analysis.confidence}% confidence.`,
+        title: "Analysis Complete!",
+        description: `Your ${analysis.title} has been analyzed and valued with ${analysis.confidence}% confidence.`,
       });
     } catch (error) {
       toast({
-        title: "Identification Failed",
-        description: "There was an error identifying your poster. Please try again.",
+        title: "Analysis Failed",
+        description: "There was an error analyzing your poster. Please try again.",
         variant: "destructive",
       });
     } finally {
