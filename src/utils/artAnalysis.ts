@@ -1,5 +1,5 @@
-// Mock art analysis function - in a real app, this would integrate with computer vision APIs
-// and art market databases
+// Real art analysis function with computer vision for condition assessment
+import { analyzeImageCondition } from './imageConditionAnalysis';
 
 interface ArtAnalysisResult {
   title: string;
@@ -89,8 +89,11 @@ const conditionMultipliers = {
 };
 
 export const analyzeArtwork = async (imageFile: File, width: string, height: string, name?: string, artist?: string, year?: string): Promise<ArtAnalysisResult> => {
-  // Simulate AI processing time for analysis
-  await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 2000));
+  // Perform real image condition analysis
+  console.log('Analyzing image condition...');
+  const conditionAnalysis = await analyzeImageCondition(imageFile);
+  const condition = conditionAnalysis.condition;
+  const conditionMultiplier = conditionMultipliers[condition];
   
   // Use manual input if provided, otherwise fall back to mock identification
   let finalPoster;
@@ -110,8 +113,6 @@ export const analyzeArtwork = async (imageFile: File, width: string, height: str
     // Fall back to mock identification
     finalPoster = mockPosters[Math.floor(Math.random() * mockPosters.length)];
   }
-  const condition = conditions[Math.floor(Math.random() * conditions.length)];
-  const conditionMultiplier = conditionMultipliers[condition];
   
   // Calculate age multiplier - modern posters (last 20 years) are less valuable
   const posterYear = parseInt(year || finalPoster.year) || new Date().getFullYear();
@@ -132,14 +133,8 @@ export const analyzeArtwork = async (imageFile: File, width: string, height: str
   const lowEstimate = Math.round(baseEstimate * 0.8);
   const highEstimate = Math.round(baseEstimate * 1.3);
   
-  // Generate confidence based on condition and random factors
-  const confidence = Math.round(
-    (condition === 'Excellent' ? 95 : 
-     condition === 'Very Good' ? 88 :
-     condition === 'Good' ? 75 :
-     condition === 'Fair' ? 65 : 45) + 
-    (Math.random() * 10 - 5)
-  );
+  // Use confidence from image analysis
+  const confidence = conditionAnalysis.confidence;
 
   // Generate comparable sales
   const generateComparableSales = () => {
