@@ -20,56 +20,60 @@ interface ArtAnalysisResult {
   }[];
 }
 
-const mockArtworks = [
+const mockPosters = [
   {
-    title: "Starry Night Study",
-    artist: "Vincent van Gogh",
-    year: "1889",
-    medium: "Oil on canvas print",
-    style: "Post-Impressionism",
-    dimensions: "24\" × 30\"",
-    baseValue: 15000,
+    title: "Star Wars: A New Hope",
+    artist: "Tom Jung",
+    year: "1977",
+    medium: "Original theatrical poster",
+    style: "Movie Poster",
+    baseValue: 850,
     marketTrend: 'rising' as const,
   },
   {
-    title: "Water Lilies Impression", 
-    artist: "Claude Monet",
-    year: "1919",
-    medium: "Lithograph print",
-    style: "Impressionism",
-    dimensions: "18\" × 24\"",
-    baseValue: 8500,
+    title: "Pink Floyd - The Wall", 
+    artist: "Gerald Scarfe",
+    year: "1979",
+    medium: "Concert poster",
+    style: "Rock Poster",
+    baseValue: 325,
     marketTrend: 'stable' as const,
   },
   {
-    title: "The Great Wave",
-    artist: "Katsushika Hokusai",
-    year: "1831",
-    medium: "Woodblock print",
-    style: "Ukiyo-e",
-    dimensions: "10\" × 15\"",
-    baseValue: 3200,
+    title: "Jaws",
+    artist: "Roger Kastel",
+    year: "1975",
+    medium: "Original movie poster",
+    style: "Movie Poster",
+    baseValue: 1200,
     marketTrend: 'rising' as const,
   },
   {
-    title: "Composition with Red Blue and Yellow",
-    artist: "Piet Mondrian", 
-    year: "1930",
-    medium: "Screen print",
-    style: "De Stijl",
-    dimensions: "20\" × 20\"",
-    baseValue: 5500,
+    title: "The Beatles - Abbey Road",
+    artist: "Apple Records",
+    year: "1969",
+    medium: "Promotional poster",
+    style: "Music Poster",
+    baseValue: 450,
     marketTrend: 'stable' as const,
   },
   {
-    title: "Campbell's Soup Can",
-    artist: "Andy Warhol",
-    year: "1962",
-    medium: "Silkscreen print",
-    style: "Pop Art",
-    dimensions: "16\" × 20\"",
-    baseValue: 12000,
-    marketTrend: 'declining' as const,
+    title: "Pulp Fiction",
+    artist: "James Verdesoto",
+    year: "1994",
+    medium: "Theatrical poster",
+    style: "Movie Poster",
+    baseValue: 275,
+    marketTrend: 'rising' as const,
+  },
+  {
+    title: "Woodstock Festival",
+    artist: "Arnold Skolnick",
+    year: "1969",
+    medium: "Event poster",
+    style: "Concert Poster",
+    baseValue: 1800,
+    marketTrend: 'rising' as const,
   }
 ];
 
@@ -84,18 +88,24 @@ const conditionMultipliers = {
   'Poor': 0.2
 };
 
-export const analyzeArtwork = async (imageFile: File): Promise<ArtAnalysisResult> => {
-  // Simulate AI processing time
-  await new Promise(resolve => setTimeout(resolve, 3000 + Math.random() * 2000));
+export const analyzeArtwork = async (imageFile: File, width: string, height: string): Promise<ArtAnalysisResult> => {
+  // Simulate AI processing time for online identification
+  await new Promise(resolve => setTimeout(resolve, 4000 + Math.random() * 2000));
   
-  // Mock analysis - randomly select an artwork and add variations
-  const baseArtwork = mockArtworks[Math.floor(Math.random() * mockArtworks.length)];
+  // Mock analysis - randomly select a poster and add variations
+  const basePoster = mockPosters[Math.floor(Math.random() * mockPosters.length)];
   const condition = conditions[Math.floor(Math.random() * conditions.length)];
   const conditionMultiplier = conditionMultipliers[condition];
   
+  // Calculate size multiplier based on dimensions
+  const widthNum = parseInt(width) || 24;
+  const heightNum = parseInt(height) || 36;
+  const area = widthNum * heightNum;
+  const sizeMultiplier = area > 500 ? 1.2 : area < 200 ? 0.8 : 1.0;
+  
   // Add some randomness to the estimates
   const variationFactor = 0.8 + Math.random() * 0.4; // 0.8 to 1.2
-  const baseEstimate = baseArtwork.baseValue * conditionMultiplier * variationFactor;
+  const baseEstimate = basePoster.baseValue * conditionMultiplier * sizeMultiplier * variationFactor;
   
   const lowEstimate = Math.round(baseEstimate * 0.8);
   const highEstimate = Math.round(baseEstimate * 1.3);
@@ -118,7 +128,7 @@ export const analyzeArtwork = async (imageFile: File): Promise<ArtAnalysisResult
       const date = new Date();
       date.setMonth(date.getMonth() - monthsAgo);
       
-      const sources = ['Sotheby\'s', 'Christie\'s', 'Phillips', 'Heritage Auctions', 'Bonhams'];
+      const sources = ['eBay', 'Heritage Auctions', 'MoviePosterShop', 'Collectors.com', 'RockPosters.com'];
       const source = sources[Math.floor(Math.random() * sources.length)];
       
       sales.push({
@@ -131,16 +141,16 @@ export const analyzeArtwork = async (imageFile: File): Promise<ArtAnalysisResult
   };
 
   return {
-    title: baseArtwork.title,
-    artist: baseArtwork.artist,
-    year: baseArtwork.year,
-    medium: baseArtwork.medium,
+    title: basePoster.title,
+    artist: basePoster.artist,
+    year: basePoster.year,
+    medium: basePoster.medium,
     condition,
-    style: baseArtwork.style,
-    dimensions: baseArtwork.dimensions,
+    style: basePoster.style,
+    dimensions: `${width}" × ${height}"`,
     lowEstimate,
     highEstimate,
-    marketTrend: baseArtwork.marketTrend,
+    marketTrend: basePoster.marketTrend,
     confidence: Math.max(40, Math.min(98, confidence)),
     comparableSales: generateComparableSales()
   };

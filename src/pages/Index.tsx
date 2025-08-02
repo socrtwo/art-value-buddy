@@ -32,23 +32,23 @@ const Index = () => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const handleImageUpload = async (file: File) => {
+  const handleImageUpload = async (data: { file: File; width: string; height: string }) => {
     setIsAnalyzing(true);
-    const url = URL.createObjectURL(file);
+    const url = URL.createObjectURL(data.file);
     setImageUrl(url);
 
     try {
-      const analysis = await analyzeArtwork(file);
+      const analysis = await analyzeArtwork(data.file, data.width, data.height);
       setValuationData(analysis);
       
       toast({
-        title: "Analysis Complete!",
-        description: `Your ${analysis.title} has been valued with ${analysis.confidence}% confidence.`,
+        title: "Identification Complete!",
+        description: `Your ${analysis.title} has been identified and valued with ${analysis.confidence}% confidence.`,
       });
     } catch (error) {
       toast({
-        title: "Analysis Failed",
-        description: "There was an error analyzing your artwork. Please try again.",
+        title: "Identification Failed",
+        description: "There was an error identifying your poster. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -74,11 +74,11 @@ const Index = () => {
           <div className="space-y-8">
             <div className="text-center space-y-4 max-w-2xl mx-auto">
               <h2 className="text-3xl font-bold text-foreground">
-                Discover Your Art's Value
+                Identify & Value Your Poster
               </h2>
               <p className="text-lg text-muted-foreground">
-                Upload a photo of your art print and get an instant AI-powered valuation 
-                based on market data, condition analysis, and comparable sales.
+                Upload a photo of your poster and get instant AI-powered identification and valuation 
+                using online databases, market data, and comparable sales.
               </p>
             </div>
             
@@ -90,9 +90,9 @@ const Index = () => {
                   <div className="w-12 h-12 rounded-full bg-estimate-high/20 mx-auto flex items-center justify-center">
                     <span className="text-2xl">🎨</span>
                   </div>
-                  <h3 className="font-semibold">AI Art Recognition</h3>
+                  <h3 className="font-semibold">AI Poster Identification</h3>
                   <p className="text-sm text-muted-foreground">
-                    Advanced computer vision identifies artists, styles, and periods
+                    Advanced image matching searches eBay and online databases for exact matches
                   </p>
                 </div>
                 <div className="space-y-2">
@@ -101,16 +101,16 @@ const Index = () => {
                   </div>
                   <h3 className="font-semibold">Market Analysis</h3>
                   <p className="text-sm text-muted-foreground">
-                    Real-time market data and comparable sales from major auction houses
+                    Real-time pricing from eBay, auction sites, and poster collector markets
                   </p>
                 </div>
                 <div className="space-y-2">
                   <div className="w-12 h-12 rounded-full bg-estimate-low/20 mx-auto flex items-center justify-center">
                     <span className="text-2xl">💎</span>
                   </div>
-                  <h3 className="font-semibold">Condition Assessment</h3>
+                  <h3 className="font-semibold">Size & Condition Factors</h3>
                   <p className="text-sm text-muted-foreground">
-                    Detailed condition analysis affects final valuation accuracy
+                    Dimensions and condition analysis for precise market valuation
                   </p>
                 </div>
               </div>
@@ -125,7 +125,7 @@ const Index = () => {
                 className="flex items-center space-x-2"
               >
                 <ArrowLeft className="w-4 h-4" />
-                <span>Analyze Another Artwork</span>
+                <span>Analyze Another Poster</span>
               </Button>
             </div>
             

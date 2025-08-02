@@ -1,7 +1,8 @@
 import React from 'react';
-import { TrendingUp, Info, DollarSign, Star, Calendar, Palette } from 'lucide-react';
+import { TrendingUp, Info, DollarSign, Star, Calendar, Palette, ExternalLink, ShoppingCart } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 
 interface ValuationData {
@@ -78,7 +79,7 @@ export const ValuationResults: React.FC<ValuationResultsProps> = ({ data, imageU
               <div className="aspect-video rounded-lg overflow-hidden border border-border">
                 <img
                   src={imageUrl}
-                  alt="Analyzed art print"
+                  alt="Analyzed poster"
                   className="w-full h-full object-contain bg-gallery-bg"
                 />
               </div>
@@ -150,6 +151,71 @@ export const ValuationResults: React.FC<ValuationResultsProps> = ({ data, imageU
         </CardContent>
       </Card>
 
+      {/* Where to Sell */}
+      <Card className="shadow-elegant">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <ShoppingCart className="w-5 h-5 text-gallery-accent" />
+            <span>Where to Sell Your Poster</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-2 gap-4">
+            <Button variant="outline" className="h-auto p-4 justify-start">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 rounded bg-blue-600 flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">e</span>
+                </div>
+                <div className="text-left">
+                  <p className="font-medium">eBay</p>
+                  <p className="text-xs text-muted-foreground">Largest marketplace for collectors</p>
+                </div>
+                <ExternalLink className="w-4 h-4 ml-auto" />
+              </div>
+            </Button>
+            
+            <Button variant="outline" className="h-auto p-4 justify-start">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 rounded bg-orange-600 flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">H</span>
+                </div>
+                <div className="text-left">
+                  <p className="font-medium">Heritage Auctions</p>
+                  <p className="text-xs text-muted-foreground">Premium auction house</p>
+                </div>
+                <ExternalLink className="w-4 h-4 ml-auto" />
+              </div>
+            </Button>
+            
+            <Button variant="outline" className="h-auto p-4 justify-start">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 rounded bg-green-600 flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">E</span>
+                </div>
+                <div className="text-left">
+                  <p className="font-medium">Etsy</p>
+                  <p className="text-xs text-muted-foreground">Vintage & collectible posters</p>
+                </div>
+                <ExternalLink className="w-4 h-4 ml-auto" />
+              </div>
+            </Button>
+            
+            <Button variant="outline" className="h-auto p-4 justify-start">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 rounded bg-purple-600 flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">C</span>
+                </div>
+                <div className="text-left">
+                  <p className="font-medium">Collectors.com</p>
+                  <p className="text-xs text-muted-foreground">Specialized poster community</p>
+                </div>
+                <ExternalLink className="w-4 h-4 ml-auto" />
+              </div>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Comparable Sales */}
       <Card className="shadow-elegant">
         <CardHeader>
@@ -186,9 +252,9 @@ export const ValuationResults: React.FC<ValuationResultsProps> = ({ data, imageU
             <div className="text-sm text-muted-foreground">
               <p className="font-medium mb-1">Important Notice</p>
               <p>
-                This valuation is an estimate based on AI analysis and market data. Actual value may vary based on 
-                authenticity, provenance, market conditions, and other factors. For formal appraisal, consult a 
-                certified art appraiser.
+                This valuation is an estimate based on AI identification and market data. Actual value may vary based on 
+                authenticity, condition, rarity, and current market demand. For valuable posters, consider getting a 
+                professional appraisal before selling.
               </p>
             </div>
           </div>

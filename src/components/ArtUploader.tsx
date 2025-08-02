@@ -1,17 +1,28 @@
 import React, { useState, useCallback } from 'react';
-import { Upload, Camera, X, Sparkles } from 'lucide-react';
+import { Upload, Camera, X, Sparkles, Ruler } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 
+interface PosterData {
+  file: File;
+  width: string;
+  height: string;
+}
+
 interface ArtUploaderProps {
-  onImageUpload: (file: File) => void;
+  onImageUpload: (data: PosterData) => void;
   isAnalyzing?: boolean;
 }
 
 export const ArtUploader: React.FC<ArtUploaderProps> = ({ onImageUpload, isAnalyzing = false }) => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [width, setWidth] = useState('');
+  const [height, setHeight] = useState('');
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -37,7 +48,17 @@ export const ArtUploader: React.FC<ArtUploaderProps> = ({ onImageUpload, isAnaly
     if (file.type.startsWith('image/')) {
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
-      onImageUpload(file);
+      setSelectedFile(file);
+    }
+  };
+
+  const handleAnalyze = () => {
+    if (selectedFile && width && height) {
+      onImageUpload({
+        file: selectedFile,
+        width,
+        height
+      });
     }
   };
 
@@ -53,6 +74,9 @@ export const ArtUploader: React.FC<ArtUploaderProps> = ({ onImageUpload, isAnaly
       URL.revokeObjectURL(previewUrl);
     }
     setPreviewUrl(null);
+    setSelectedFile(null);
+    setWidth('');
+    setHeight('');
   };
 
   return (
@@ -87,12 +111,12 @@ export const ArtUploader: React.FC<ArtUploaderProps> = ({ onImageUpload, isAnaly
             
             <div className="space-y-2">
               <h3 className="text-xl font-semibold text-foreground">
-                {isAnalyzing ? 'Analyzing Your Art Print...' : 'Upload Your Art Print'}
+                {isAnalyzing ? 'Identifying Your Poster...' : 'Upload Your Poster'}
               </h3>
               <p className="text-muted-foreground max-w-sm">
                 {isAnalyzing 
-                  ? 'Our AI is examining your artwork to provide accurate valuation'
-                  : 'Drag and drop your image here, or click to browse'
+                  ? 'Our AI is searching online databases to identify and value your poster'
+                  : 'Drag and drop your poster image here, or click to browse'
                 }
               </p>
             </div>
@@ -111,33 +135,77 @@ export const ArtUploader: React.FC<ArtUploaderProps> = ({ onImageUpload, isAnaly
           </div>
         </Card>
       ) : (
-        <Card className="relative overflow-hidden shadow-elegant">
-          <div className="aspect-video relative">
-            <img
-              src={previewUrl}
-              alt="Art print preview"
-              className="w-full h-full object-contain bg-gallery-bg"
-            />
-            {!isAnalyzing && (
-              <Button
-                variant="secondary"
-                size="sm"
-                className="absolute top-4 right-4"
-                onClick={clearImage}
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            )}
-            {isAnalyzing && (
-              <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                <div className="bg-card/90 backdrop-blur-sm rounded-lg p-4 flex items-center space-x-3">
-                  <Sparkles className="w-5 h-5 text-gallery-accent animate-pulse-glow" />
-                  <span className="text-sm font-medium">Analyzing artwork...</span>
+        <div className="space-y-4">
+          <Card className="relative overflow-hidden shadow-elegant">
+            <div className="aspect-video relative">
+              <img
+                src={previewUrl}
+                alt="Poster preview"
+                className="w-full h-full object-contain bg-gallery-bg"
+              />
+              {!isAnalyzing && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="absolute top-4 right-4"
+                  onClick={clearImage}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              )}
+              {isAnalyzing && (
+                <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                  <div className="bg-card/90 backdrop-blur-sm rounded-lg p-4 flex items-center space-x-3">
+                    <Sparkles className="w-5 h-5 text-gallery-accent animate-pulse-glow" />
+                    <span className="text-sm font-medium">Identifying poster...</span>
+                  </div>
                 </div>
+              )}
+            </div>
+          </Card>
+
+          {!isAnalyzing && (
+            <Card className="p-6 shadow-elegant">
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2 mb-4">
+                  <Ruler className="w-5 h-5 text-gallery-accent" />
+                  <h3 className="text-lg font-semibold">Poster Dimensions</h3>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="width">Width (inches)</Label>
+                    <Input
+                      id="width"
+                      type="number"
+                      placeholder="24"
+                      value={width}
+                      onChange={(e) => setWidth(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="height">Height (inches)</Label>
+                    <Input
+                      id="height"
+                      type="number"
+                      placeholder="36"
+                      value={height}
+                      onChange={(e) => setHeight(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <Button 
+                  onClick={handleAnalyze}
+                  disabled={!selectedFile || !width || !height}
+                  className="w-full"
+                  variant="premium"
+                >
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Identify & Value Poster
+                </Button>
               </div>
-            )}
-          </div>
-        </Card>
+            </Card>
+          )}
+        </div>
       )}
     </div>
   );
