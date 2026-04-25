@@ -1,5 +1,10 @@
 # Welcome to your Lovable project
 
+<!--PAGES_LINK_BANNER-->
+> 🌐 **Live page:** [https://socrtwo.github.io/art-value-buddy/](https://socrtwo.github.io/art-value-buddy/)  
+> 📦 **Releases:** [github.com/socrtwo/art-value-buddy/releases](https://github.com/socrtwo/art-value-buddy/releases)
+<!--/PAGES_LINK_BANNER-->
+
 ## Project info
 
 **URL**: https://lovable.dev/projects/91248437-ceba-4275-8f24-f92a1e736942
