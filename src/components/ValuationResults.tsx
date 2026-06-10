@@ -1,31 +1,13 @@
 import React from 'react';
-import { TrendingUp, Info, DollarSign, Star, Calendar, Palette, ExternalLink, ShoppingCart } from 'lucide-react';
+import { TrendingUp, Info, DollarSign, Star, Calendar, Palette, ExternalLink, ShoppingCart, BarChart3 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-
-interface ValuationData {
-  title: string;
-  artist: string;
-  year: string;
-  medium: string;
-  condition: 'Excellent' | 'Very Good' | 'Good' | 'Fair' | 'Poor';
-  style: string;
-  dimensions: string;
-  lowEstimate: number;
-  highEstimate: number;
-  marketTrend: 'rising' | 'stable' | 'declining';
-  confidence: number;
-  comparableSales: {
-    price: number;
-    date: string;
-    source: string;
-  }[];
-}
+import type { ArtAnalysisResult } from '@/utils/artAnalysis';
 
 interface ValuationResultsProps {
-  data: ValuationData;
+  data: ArtAnalysisResult;
   imageUrl: string;
 }
 
@@ -74,6 +56,12 @@ export const ValuationResults: React.FC<ValuationResultsProps> = ({ data, imageU
       default: return null;
     }
   };
+
+  const formatMultiplier = (value: number) => {
+    return `${value.toFixed(2)}x`;
+  };
+
+  const breakdown = data.valuationBreakdown;
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6 animate-fade-in">
@@ -155,7 +143,7 @@ export const ValuationResults: React.FC<ValuationResultsProps> = ({ data, imageU
               {formatPrice(data.lowEstimate)} - {formatPrice(data.highEstimate)}
             </div>
             <p className="text-muted-foreground">
-              Based on current market conditions and comparable sales
+              Based on condition, age, size, edition, and category analysis
             </p>
             <div className="flex justify-center items-center space-x-2">
               <span className="text-sm">Market Trend:</span>
@@ -167,6 +155,61 @@ export const ValuationResults: React.FC<ValuationResultsProps> = ({ data, imageU
         </CardContent>
       </Card>
 
+      {/* Valuation Breakdown */}
+      {breakdown && (
+        <Card className="shadow-elegant">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <BarChart3 className="w-5 h-5 text-gallery-accent" />
+              <span>Valuation Breakdown</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center py-2">
+                <div>
+                  <p className="font-medium">Base Value</p>
+                  <p className="text-xs text-muted-foreground">{breakdown.categoryLabel}</p>
+                </div>
+                <span className="font-mono text-sm">{formatPrice(breakdown.baseValue)}</span>
+              </div>
+              <Separator />
+              <div className="flex justify-between items-center py-2">
+                <div>
+                  <p className="font-medium">Condition</p>
+                  <p className="text-xs text-muted-foreground">{data.condition}</p>
+                </div>
+                <span className="font-mono text-sm">{formatMultiplier(breakdown.conditionMultiplier)}</span>
+              </div>
+              <Separator />
+              <div className="flex justify-between items-center py-2">
+                <div>
+                  <p className="font-medium">Age Factor</p>
+                  <p className="text-xs text-muted-foreground">{data.year} ({new Date().getFullYear() - parseInt(data.year)} years old)</p>
+                </div>
+                <span className="font-mono text-sm">{formatMultiplier(breakdown.ageMultiplier)}</span>
+              </div>
+              <Separator />
+              <div className="flex justify-between items-center py-2">
+                <div>
+                  <p className="font-medium">Size Factor</p>
+                  <p className="text-xs text-muted-foreground">{data.dimensions}</p>
+                </div>
+                <span className="font-mono text-sm">{formatMultiplier(breakdown.sizeMultiplier)}</span>
+              </div>
+              <Separator />
+              <div className="flex justify-between items-center py-2">
+                <div>
+                  <p className="font-medium">Edition</p>
+                  <p className="text-xs text-muted-foreground">{breakdown.editionLabel}</p>
+                </div>
+                <span className="font-mono text-sm">{formatMultiplier(breakdown.editionMultiplier)}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Where to Sell */}
       <Card className="shadow-elegant">
         <CardHeader>
@@ -177,8 +220,8 @@ export const ValuationResults: React.FC<ValuationResultsProps> = ({ data, imageU
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-2 gap-4">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="h-auto p-4 justify-start"
               onClick={() => window.open(links.ebay, '_blank')}
             >
@@ -193,9 +236,9 @@ export const ValuationResults: React.FC<ValuationResultsProps> = ({ data, imageU
                 <ExternalLink className="w-4 h-4 ml-auto" />
               </div>
             </Button>
-            
-            <Button 
-              variant="outline" 
+
+            <Button
+              variant="outline"
               className="h-auto p-4 justify-start"
               onClick={() => window.open(links.heritage, '_blank')}
             >
@@ -210,9 +253,9 @@ export const ValuationResults: React.FC<ValuationResultsProps> = ({ data, imageU
                 <ExternalLink className="w-4 h-4 ml-auto" />
               </div>
             </Button>
-            
-            <Button 
-              variant="outline" 
+
+            <Button
+              variant="outline"
               className="h-auto p-4 justify-start"
               onClick={() => window.open(links.etsy, '_blank')}
             >
@@ -227,9 +270,9 @@ export const ValuationResults: React.FC<ValuationResultsProps> = ({ data, imageU
                 <ExternalLink className="w-4 h-4 ml-auto" />
               </div>
             </Button>
-            
-            <Button 
-              variant="outline" 
+
+            <Button
+              variant="outline"
               className="h-auto p-4 justify-start"
               onClick={() => window.open(links.movieposters, '_blank')}
             >
@@ -284,9 +327,10 @@ export const ValuationResults: React.FC<ValuationResultsProps> = ({ data, imageU
             <div className="text-sm text-muted-foreground">
               <p className="font-medium mb-1">Important Notice</p>
               <p>
-                This valuation is an estimate based on AI identification and market data. Actual value may vary based on 
-                authenticity, condition, rarity, and current market demand. For valuable posters, consider getting a 
-                professional appraisal before selling.
+                This valuation is an estimate based on our reference database, image condition analysis,
+                and category-based pricing models. Actual value may vary based on authenticity,
+                provenance, rarity, and current market demand. For high-value posters, consider
+                getting a professional appraisal before selling.
               </p>
             </div>
           </div>

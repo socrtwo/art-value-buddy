@@ -1,46 +1,38 @@
 import React, { useState } from 'react';
 import { Header } from '@/components/Header';
 import { ArtUploader } from '@/components/ArtUploader';
+import type { PosterData } from '@/components/ArtUploader';
 import { ValuationResults } from '@/components/ValuationResults';
 import { analyzeArtwork } from '@/utils/artAnalysis';
+import type { ArtAnalysisResult } from '@/utils/artAnalysis';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-interface ValuationData {
-  title: string;
-  artist: string;
-  year: string;
-  medium: string;
-  condition: 'Excellent' | 'Very Good' | 'Good' | 'Fair' | 'Poor';
-  style: string;
-  dimensions: string;
-  lowEstimate: number;
-  highEstimate: number;
-  marketTrend: 'rising' | 'stable' | 'declining';
-  confidence: number;
-  comparableSales: {
-    price: number;
-    date: string;
-    source: string;
-  }[];
-}
-
 const Index = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [valuationData, setValuationData] = useState<ValuationData | null>(null);
+  const [valuationData, setValuationData] = useState<ArtAnalysisResult | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const handleImageUpload = async (data: { file: File; width: string; height: string; name: string; artist: string; year: string }) => {
+  const handleImageUpload = async (data: PosterData) => {
     setIsAnalyzing(true);
     const url = URL.createObjectURL(data.file);
     setImageUrl(url);
 
     try {
-      const analysis = await analyzeArtwork(data.file, data.width, data.height, data.name, data.artist, data.year);
+      const analysis = await analyzeArtwork(
+        data.file,
+        data.width,
+        data.height,
+        data.name,
+        data.artist,
+        data.year,
+        data.category,
+        data.edition,
+      );
       setValuationData(analysis);
-      
+
       toast({
         title: "Analysis Complete!",
         description: `Your ${analysis.title} has been analyzed and valued with ${analysis.confidence}% confidence.`,
@@ -68,7 +60,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-gallery">
       <Header />
-      
+
       <main className="container mx-auto px-4 py-8">
         {!valuationData ? (
           <div className="space-y-8">
@@ -77,40 +69,40 @@ const Index = () => {
                 Identify & Value Your Poster
               </h2>
               <p className="text-lg text-muted-foreground">
-                Upload a photo of your poster and get instant AI-powered identification and valuation 
-                using online databases, market data, and comparable sales.
+                Upload a photo of your poster and provide details for an accurate,
+                market-based valuation using our reference database of collectible posters.
               </p>
             </div>
-            
+
             <ArtUploader onImageUpload={handleImageUpload} isAnalyzing={isAnalyzing} />
-            
+
             <div className="text-center space-y-6 max-w-3xl mx-auto">
               <div className="grid md:grid-cols-3 gap-6 text-center">
                 <div className="space-y-2">
                   <div className="w-12 h-12 rounded-full bg-estimate-high/20 mx-auto flex items-center justify-center">
                     <span className="text-2xl">🎨</span>
                   </div>
-                  <h3 className="font-semibold">AI Poster Identification</h3>
+                  <h3 className="font-semibold">Reference Database</h3>
                   <p className="text-sm text-muted-foreground">
-                    Advanced image matching searches eBay and online databases for exact matches
+                    Matches against 50+ iconic posters with verified market values across 11 categories
                   </p>
                 </div>
                 <div className="space-y-2">
                   <div className="w-12 h-12 rounded-full bg-estimate-medium/20 mx-auto flex items-center justify-center">
                     <span className="text-2xl">📊</span>
                   </div>
-                  <h3 className="font-semibold">Market Analysis</h3>
+                  <h3 className="font-semibold">Multi-Factor Valuation</h3>
                   <p className="text-sm text-muted-foreground">
-                    Real-time pricing from eBay, auction sites, and poster collector markets
+                    Condition, age, size, edition type, and category all factor into the estimate
                   </p>
                 </div>
                 <div className="space-y-2">
                   <div className="w-12 h-12 rounded-full bg-estimate-low/20 mx-auto flex items-center justify-center">
                     <span className="text-2xl">💎</span>
                   </div>
-                  <h3 className="font-semibold">Size & Condition Factors</h3>
+                  <h3 className="font-semibold">Condition Analysis</h3>
                   <p className="text-sm text-muted-foreground">
-                    Dimensions and condition analysis for precise market valuation
+                    Computer vision analyzes your photo for brightness, sharpness, and edge damage
                   </p>
                 </div>
               </div>
@@ -128,7 +120,7 @@ const Index = () => {
                 <span>Analyze Another Poster</span>
               </Button>
             </div>
-            
+
             {imageUrl && (
               <ValuationResults data={valuationData} imageUrl={imageUrl} />
             )}

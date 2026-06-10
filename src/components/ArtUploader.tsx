@@ -4,21 +4,47 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import type { PosterCategory, EditionType } from '@/utils/artAnalysis';
 
-interface PosterData {
+export interface PosterData {
   file: File;
   width: string;
   height: string;
   name: string;
   artist: string;
   year: string;
+  category: PosterCategory;
+  edition: EditionType;
 }
 
 interface ArtUploaderProps {
   onImageUpload: (data: PosterData) => void;
   isAnalyzing?: boolean;
 }
+
+const categoryOptions: { value: PosterCategory; label: string }[] = [
+  { value: 'movie', label: 'Movie Poster' },
+  { value: 'concert_music', label: 'Concert / Music' },
+  { value: 'travel_vintage', label: 'Vintage Travel' },
+  { value: 'art_exhibition', label: 'Art Exhibition' },
+  { value: 'propaganda_political', label: 'Propaganda / Political' },
+  { value: 'advertising_commercial', label: 'Advertising / Commercial' },
+  { value: 'sports', label: 'Sports' },
+  { value: 'psychedelic', label: 'Psychedelic' },
+  { value: 'anime_manga', label: 'Anime / Manga' },
+  { value: 'theater_broadway', label: 'Theater / Broadway' },
+  { value: 'other', label: 'Other / Unknown' },
+];
+
+const editionOptions: { value: EditionType; label: string }[] = [
+  { value: 'original_first', label: 'Original / First Print' },
+  { value: 'limited_edition', label: 'Limited Edition' },
+  { value: 'official_reprint', label: 'Official Reprint' },
+  { value: 'reproduction', label: 'Reproduction / Modern Copy' },
+  { value: 'unknown', label: "I'm Not Sure" },
+];
 
 export const ArtUploader: React.FC<ArtUploaderProps> = ({ onImageUpload, isAnalyzing = false }) => {
   const [isDragOver, setIsDragOver] = useState(false);
@@ -29,6 +55,8 @@ export const ArtUploader: React.FC<ArtUploaderProps> = ({ onImageUpload, isAnaly
   const [name, setName] = useState('');
   const [artist, setArtist] = useState('');
   const [year, setYear] = useState('');
+  const [category, setCategory] = useState<PosterCategory>('other');
+  const [edition, setEdition] = useState<EditionType>('unknown');
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -43,7 +71,7 @@ export const ArtUploader: React.FC<ArtUploaderProps> = ({ onImageUpload, isAnaly
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(false);
-    
+
     const files = e.dataTransfer.files;
     if (files.length > 0) {
       handleFileSelect(files[0]);
@@ -66,7 +94,9 @@ export const ArtUploader: React.FC<ArtUploaderProps> = ({ onImageUpload, isAnaly
         height,
         name: name || 'Unknown Poster',
         artist: artist || 'Unknown Artist',
-        year: year || new Date().getFullYear().toString()
+        year: year || new Date().getFullYear().toString(),
+        category,
+        edition,
       });
     }
   };
@@ -89,6 +119,8 @@ export const ArtUploader: React.FC<ArtUploaderProps> = ({ onImageUpload, isAnaly
     setName('');
     setArtist('');
     setYear('');
+    setCategory('other');
+    setEdition('unknown');
   };
 
   return (
@@ -111,7 +143,7 @@ export const ArtUploader: React.FC<ArtUploaderProps> = ({ onImageUpload, isAnaly
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
             disabled={isAnalyzing}
           />
-          
+
           <div className="flex flex-col items-center space-y-4">
             <div className="w-16 h-16 rounded-full bg-gradient-accent flex items-center justify-center">
               {isAnalyzing ? (
@@ -120,19 +152,19 @@ export const ArtUploader: React.FC<ArtUploaderProps> = ({ onImageUpload, isAnaly
                 <Upload className="w-8 h-8 text-white" />
               )}
             </div>
-            
+
             <div className="space-y-2">
               <h3 className="text-xl font-semibold text-foreground">
                 {isAnalyzing ? 'Identifying Your Poster...' : 'Upload Your Poster'}
               </h3>
               <p className="text-muted-foreground max-w-sm">
-                {isAnalyzing 
-                  ? 'Our AI is searching online databases to identify and value your poster'
+                {isAnalyzing
+                  ? 'Our AI is analyzing condition and estimating value'
                   : 'Drag and drop your poster image here, or click to browse'
                 }
               </p>
             </div>
-            
+
             {!isAnalyzing && (
               <div className="flex items-center space-x-4">
                 <Button variant="premium" className="flex items-center space-x-2">
@@ -169,7 +201,7 @@ export const ArtUploader: React.FC<ArtUploaderProps> = ({ onImageUpload, isAnaly
                 <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
                   <div className="bg-card/90 backdrop-blur-sm rounded-lg p-4 flex items-center space-x-3">
                     <Sparkles className="w-5 h-5 text-gallery-accent animate-pulse-glow" />
-                    <span className="text-sm font-medium">Identifying poster...</span>
+                    <span className="text-sm font-medium">Analyzing poster...</span>
                   </div>
                 </div>
               )}
@@ -184,10 +216,10 @@ export const ArtUploader: React.FC<ArtUploaderProps> = ({ onImageUpload, isAnaly
                     <Ruler className="w-5 h-5 text-gallery-accent" />
                     <h3 className="text-lg font-semibold">Poster Details</h3>
                   </div>
-                  
+
                   <div className="grid gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="name">Poster Name (Optional)</Label>
+                      <Label htmlFor="name">Poster Name</Label>
                       <Input
                         id="name"
                         type="text"
@@ -195,10 +227,11 @@ export const ArtUploader: React.FC<ArtUploaderProps> = ({ onImageUpload, isAnaly
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                       />
+                      <p className="text-xs text-muted-foreground">Providing a name helps match against our database of known posters</p>
                     </div>
-                    
+
                     <div className="space-y-2">
-                      <Label htmlFor="artist">Artist/Designer (Optional)</Label>
+                      <Label htmlFor="artist">Artist / Designer</Label>
                       <Input
                         id="artist"
                         type="text"
@@ -207,19 +240,48 @@ export const ArtUploader: React.FC<ArtUploaderProps> = ({ onImageUpload, isAnaly
                         onChange={(e) => setArtist(e.target.value)}
                       />
                     </div>
-                    
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="year">Year</Label>
+                        <Input
+                          id="year"
+                          type="number"
+                          placeholder="e.g., 1977"
+                          min="1850"
+                          max={new Date().getFullYear()}
+                          value={year}
+                          onChange={(e) => setYear(e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="category">Category</Label>
+                        <Select value={category} onValueChange={(v) => setCategory(v as PosterCategory)}>
+                          <SelectTrigger id="category">
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {categoryOptions.map(opt => (
+                              <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
                     <div className="space-y-2">
-                      <Label htmlFor="year">Year (Optional)</Label>
-                      <Input
-                        id="year"
-                        type="number"
-                        placeholder="e.g., 1977"
-                        min="1900"
-                        max={new Date().getFullYear()}
-                        value={year}
-                        onChange={(e) => setYear(e.target.value)}
-                      />
-                      <p className="text-xs text-muted-foreground">Leave blank for modern prints (assumed last 20 years)</p>
+                      <Label htmlFor="edition">Edition / Print Type</Label>
+                      <Select value={edition} onValueChange={(v) => setEdition(v as EditionType)}>
+                        <SelectTrigger id="edition">
+                          <SelectValue placeholder="Select edition type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {editionOptions.map(opt => (
+                            <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground">Original prints are worth significantly more than reproductions</p>
                     </div>
                   </div>
                 </div>
@@ -252,7 +314,7 @@ export const ArtUploader: React.FC<ArtUploaderProps> = ({ onImageUpload, isAnaly
                       />
                     </div>
                   </div>
-                  <Button 
+                  <Button
                     onClick={handleAnalyze}
                     disabled={!selectedFile || !width || !height}
                     className="w-full"
